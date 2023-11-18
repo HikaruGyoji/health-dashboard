@@ -90,21 +90,17 @@ monthly_exercise_count_df['日付'] = monthly_exercise_count_df['日付'].dt.str
 monthly_distance_diff_df['日付'] = monthly_distance_diff_df['日付'].dt.strftime('%Y-%m')
 
 # 目標達成率を計算し、新しいカラム '達成率' をデータフレームに追加
-monthly_target_distance_df['達成率'] = (1 - (monthly_distance_diff_df['移動距離'] / monthly_target_distance_df['目標移動距離'])) * 100
+monthly_target_distance_df['達成率'] = ((monthly_distance_diff_df['移動距離'] / monthly_target_distance_df['目標移動距離'] * 30))
+monthly_target_distance_df['達成率'] = monthly_target_distance_df['達成率'].clip(upper=100)
 
 # 3つのグラフを均等の横幅で表示
 col1, col2, col3 = st.columns(3)
 
-# 月ごとの達成率を計算
-monthly_target_distance_df['達成率'] = (1 - (monthly_distance_diff_df['移動距離'] / monthly_target_distance_df['目標移動距離'])) * 100
-
-# 達成率が100%を超える場合、100%に制限
-monthly_target_distance_df['達成率'] = monthly_target_distance_df['達成率'].clip(upper=100)
 
 # 月ごとの目標移動距離と達成率の推移
 fig1 = make_subplots(specs=[[{"secondary_y": True}]])
-fig1.add_trace(go.Scatter(x=monthly_target_distance_df['日付'], y=monthly_target_distance_df['目標移動距離'], name="目標移動距離"), secondary_y=False)
-fig1.add_trace(go.Scatter(x=monthly_target_distance_df['日付'], y=monthly_target_distance_df['達成率'], name="達成率", line=dict(dash='dot')), secondary_y=True)
+fig1.add_trace(go.Scatter(x=monthly_target_distance_df['日付'], y=monthly_target_distance_df['目標移動距離'], name="目標移動距離", line=dict(dash='dot')), secondary_y=False)
+fig1.add_trace(go.Scatter(x=monthly_target_distance_df['日付'], y=monthly_target_distance_df['達成率'], name="達成率"), secondary_y=True)
 fig1.update_xaxes(title_text="日付")
 fig1.update_yaxes(title_text="目標移動距離", secondary_y=False)
 fig1.update_yaxes(title_text="達成率 (%)", secondary_y=True)
